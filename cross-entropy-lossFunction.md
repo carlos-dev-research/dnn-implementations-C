@@ -4,15 +4,15 @@
 
 The softmax function for a vector $\( \mathbf{z} \)$ with elements $\( z_i \)$ is defined as:
 
-<big>$\ y_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}} \$<big>
+$\ y_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}} \$
 
-where \( y_i \) is the output of the softmax function for the \( i \)-th element.
+where $\( y_i \)$ is the output of the softmax function for the \( i \)-th element.
 
 ## 2. Cross-Entropy Loss Function
 
 The cross-entropy loss function for a single training example is defined as:
 
-\[ L = - \sum_{i} t_i \log(y_i) \]
+$\[ L = - \sum_{i} t_i \log(y_i) \]$
 
 where \( t_i \) is the target probability for class \( i \), and \( y_i \) is the predicted probability for class \( i \) from the softmax function.
 
