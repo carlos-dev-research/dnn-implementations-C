@@ -40,7 +40,7 @@ $\ L = - \sum_{i} t_i z_i + \sum_{i} t_i \log\left( \sum_{j} e^{z_j} \right) \$
 
 $\ L = - \sum_{i} t_i z_i + \log\left( \sum_{j} e^{z_j} \right) \sum_{i} t_i \$
 
-Since $\( \sum_{i} t_i = 1 \) (target probabilities sum to 1):
+Since $\( \sum_{i} t_i = 1 \)$ (target probabilities sum to 1):
 
 $\ L = - \sum_{i} t_i z_i + \log\left( \sum_{j} e^{z_j} \right) \$
 
