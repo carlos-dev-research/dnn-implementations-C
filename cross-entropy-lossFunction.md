@@ -4,7 +4,7 @@
 
 The softmax function for a vector $\( \mathbf{z} \)$ with elements $\( z_i \)$ is defined as:
 
-$\ y_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}} \$
+<big>$\ y_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}} \$<big>
 
 where \( y_i \) is the output of the softmax function for the \( i \)-th element.
 
