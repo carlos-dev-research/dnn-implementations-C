@@ -19,7 +19,7 @@
 
 // Defin model hyperparameters
 #define LEARNING_RATE 0.01
-#define EPOCHS 10
+#define EPOCHS 1
 
 // Dataset paths
 #define TRAIN_IMAGES "data/train-images.idx3-ubyte"
@@ -41,18 +41,35 @@ void initialize(NeuralNetwork *nn){
         }
          nn->bias[i] = ((float)rand() / RAND_MAX) * 2 - 1;
     }
-    // Debug: Print initial weights and biases
-    printf("Initial weights and biases:\n");
-    for (int i = 0; i < OUTPUT_NEURONS; i++) {
-        printf("Neuron %d: Bias = %.5f\n", i, nn->bias[i]);
-        for (int j = 0; j < INPUT_NEURONS; j++) {
-            if (j < 5) {  // Only print the first 5 weights for brevity
-                printf("Weight[%d][%d] = %.5f ", i, j, nn->weights[i][j]);
-            }
-        }
-        printf("\n");
-    }
 }
+
+void saveNeuralNetwork(const char *filename, NeuralNetwork *nn) {
+    FILE *file = fopen(filename, "wb");
+    if (file == NULL) {
+        perror("Failed to open file for writing");
+        exit(EXIT_FAILURE);
+    }
+
+    // Write the struct to the file
+    fwrite(nn, sizeof(NeuralNetwork), 1, file);
+
+    fclose(file);
+}
+
+int loadNeuralNetwork(const char *filename, NeuralNetwork *nn) {
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL) {
+        return 1;
+    }
+
+    // Read the struct from the file
+    fread(nn, sizeof(NeuralNetwork), 1, file);
+
+    fclose(file);
+    return 0;
+}
+
+
 
 // Function to normalize the pixel values
 void process_images(uint8_t *image_data, float **normalized_images, int num_images, int image_size) {
@@ -268,7 +285,12 @@ int main() {
     uint8_t* train_images = read_mnist_images(TRAIN_IMAGES, &number_of_images, &image_size);
     unsigned char* train_labels = read_mnist_labels(TRAIN_LABELS, &number_of_labels);
     NeuralNetwork nn;
-    initialize(&nn);
+
+    // Check if the file exists and load the neural network if it does
+    if (loadNeuralNetwork("neural_network.dat", &nn) != 0) {
+        // File does not exist, initialize the neural network
+        initialize(&nn);
+    }
 
     if (number_of_images != number_of_labels) {
         fprintf(stderr, "Number of images does not match number of labels\n");
@@ -354,6 +376,8 @@ int main() {
     }
 
     printf("Predicted class for the image: %d\n", predicted_class);
+
+    saveNeuralNetwork("neural_network.dat", &nn);
 
     return 0;
 }
