@@ -1,4 +1,8 @@
 // Importing Standard Libraries
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_IMAGE_RESIZE2_IMPLEMENTATION
+#include "stb_image_resize2.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -15,7 +19,7 @@
 
 // Defin model hyperparameters
 #define LEARNING_RATE 0.01
-#define EPOCHS 2
+#define EPOCHS 10
 
 // Dataset paths
 #define TRAIN_IMAGES "data/train-images.idx3-ubyte"
@@ -59,6 +63,12 @@ void process_images(uint8_t *image_data, float **normalized_images, int num_imag
     }
 }
 
+// Function to normalize the pixel values
+void process_image(uint8_t *image_data, float *normalized_image, int image_size) {
+    for (int i = 0; i < image_size; i++) {
+        normalized_image[i] = image_data[i] / 255.0f;
+    }
+}
 
 // Loss function and its derivative
 // Function to calculate the softmax
@@ -228,6 +238,26 @@ void print_final_results(NeuralNetwork *nn, float **images, unsigned char *label
     }
 }
 
+// Function to load and preprocess an image using stb_image
+int load_and_preprocess_image(const char* filename, float* processed_image) {
+    int width, height, channels;
+    unsigned char *img = stbi_load(filename, &width, &height, &channels, 1);
+    if (img == NULL) {
+        printf("Failed to load image\n");
+        return 1;
+    }
+
+    unsigned char resized_img[28 * 28];
+    
+    // Perform the resize operation using the easy API
+    stbir_resize_uint8_linear(img, width, height, 0, resized_img, 28, 28, 0, STBIR_1CHANNEL);
+
+    process_image(resized_img, processed_image, 28 * 28); // Normalize the resized image
+
+    stbi_image_free(img);
+
+    return 0;
+}
 
 int main() {
     time_t t;
@@ -301,6 +331,29 @@ int main() {
 
     free(train_images);
     free(train_labels);
+
+    // Inference on file
+    // Load and preprocess the image
+    float processed_image[28 * 28];
+    if (load_and_preprocess_image("image.jpg", processed_image) != 0) {
+        return 1;
+    }
+
+    // Perform inference on the preprocessed image
+    float output_test[OUTPUT_NEURONS] = {0};
+    forward_prop(&nn, processed_image, output_test);
+
+    // Find the predicted class
+    int predicted_class = 0;
+    float max_value = output_test[0];
+    for (int i = 1; i < OUTPUT_NEURONS; i++) {
+        if (output_test[i] > max_value) {
+            max_value = output_test[i];
+            predicted_class = i;
+        }
+    }
+
+    printf("Predicted class for the image: %d\n", predicted_class);
 
     return 0;
 }
